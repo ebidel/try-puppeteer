@@ -23,8 +23,7 @@ that works with Puppeteer on Linux.
 #### Building it
 
 ```sh
-cd backend
-./build.sh
+yarn build
 ```
 
 #### Running the container
@@ -36,8 +35,7 @@ The container can be run in two modes, standalone as an executable or as a web s
 The first is a "standalone" mode that you can from a Puppeteer script from the CLI. It takes a script file as an argument and runs it in the container.
 
 ```
-cd backend
-./run_puppeteer.sh your-puppeteer-script.js
+./backend/run_puppeteer.sh your-puppeteer-script.js
 ```
 
 **2. Running the web service**
