@@ -1,5 +1,6 @@
 # FROM ubuntu:latest
-FROM node:8
+# FROM node:8
+FROM node:8-slim
 
 MAINTAINER Eric Bidelman <ebidel@>
 
