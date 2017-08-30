@@ -1,0 +1,193 @@
+/**
+ * Copyright 2017 Google Inc., PhantomJS Authors All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+* {
+  box-sizing: border-box;
+}
+:root {
+  --default-padding: 16px;
+  --half-default-padding: calc(var(--default-padding) / 2);
+  --editor-background-color: var(--material-blue-grey-dark);
+  --shell-color: var(--material-blue-grey-800);
+  --material-blue-grey-300: #90A4AE;
+  --material-blue-grey-600: #546E7A;
+  --material-blue-grey-800: #37474F;
+  --material-blue-grey-dark: #263238;
+}
+body {
+  font-family: 'Product Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  margin: 0;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+h1, h2, h3 {
+  margin: 0;
+  font-weight: inherit;
+}
+main {
+  height: 100vh;
+}
+section {
+  width: 50%;
+}
+
+/* Layout classes */
+.layout {
+  display: flex;
+}
+.layout.vertical {
+  flex-direction: column;
+}
+.layout.center {
+  align-items: center;
+}
+.layout.center-center {
+  align-items: center;
+  justify-content: center;
+}
+.flex {
+  flex: 1;
+}
+
+.title {
+  font-size: 30px;
+}
+.logo {
+  height: 40px;
+  margin-left: var(--half-default-padding);
+}
+section header {
+  display: flex;
+  align-items: center;
+  height: 70px;
+  background-color: var(--shell-color);
+  color: #fff;
+}
+section footer {
+  padding: var(--default-padding);
+  background-color: var(--shell-color);
+  color: #fff;
+}
+.code-editor-section {
+  background: var(--editor-background-color);
+}
+.code-editor-section header {
+  padding: 0 var(--default-padding);
+}
+/* .result-section header {
+   background: #eee;
+} */
+.puppeteer-result-log, .puppeteer-result-output {
+  padding: var(--default-padding);
+  padding-top: calc(var(--default-padding) * 3);
+  position: relative;
+  white-space: pre;
+  height: 100%;
+  overflow: auto;
+}
+.puppeteer-result-log::before, .puppeteer-result-output::before {
+  font-size: 24px;
+  color: var(--shell-color);
+  text-transform: uppercase;
+  line-height: 1;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: var(--default-padding);
+}
+.puppeteer-result-log {
+  height: 300%;
+  border-bottom: 5px solid var(--shell-color);
+}
+.puppeteer-result-output::before {
+  content: 'Result';
+}
+.puppeteer-result-log::before {
+  content: 'Log';
+}
+.puppeteer-results {
+  position: relative;
+}
+.puppeteer-result-log::after {
+  content: '';
+  position: absolute;
+  background: url('https://user-images.githubusercontent.com/10379601/29446482-04f7036a-841f-11e7-9872-91d1fc2ea683.png') no-repeat 50% 50%;
+  background-size: 40%;
+  /* background-attachment: fixed; */
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0.03;
+  z-index: -1;
+}
+#run_button {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+  flex-shrink: 0;
+  align-self: flex-end;
+  /* justify-content: flex-end; */
+  bottom: 56px;
+  margin-bottom: calc(var(--default-padding) * 2);
+  position: absolute;
+  background-color: var(--material-blue-grey-300);
+  color: #fff;
+  border: none;
+  font: inherit;
+  font-size: 20px;
+  padding: var(--default-padding);
+  cursor: pointer;
+  outline: none;
+  z-index: 100;
+}
+#run_button img {
+  height: 24px;
+  width: 24px;
+  margin-right: 4px;
+}
+
+#code-editor-area {
+  display: none;
+}
+
+/* Codemirror overrides */
+.CodeMirror {
+  font-family: inherit;
+  padding: var(--default-padding) 0;
+  height: 100%;
+}
+.CodeMirror.CodeMirror-wrap, .CodeMirror .CodeMirror-gutters {
+  background: var(--editor-background-color);
+}
+.CodeMirror .readonly-line {
+  position: relative;
+  pointer-events: none;
+}
+.CodeMirror .readonly-line::before {
+  background: var(--editor-background-color);
+  opacity: 0.5;
+  content: '';
+  width: 100%;
+  top: 0;
+  height: 100%;
+  position: absolute;
+  z-index: 5;
+}
