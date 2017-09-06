@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/* global document fetch location Blob FormData EventSource CodeMirror */
+/* global document fetch location Blob FormData URL CodeMirror */
 
 (() => {
 'use strict';
@@ -35,8 +35,13 @@ const editor = CodeMirror.fromTextArea(textarea, {
     'Ctrl-Space': 'autocomplete',
     'Tab': 'autocomplete'
   },
+  keyMap: 'sublime',
   hintOptions: {hint: puppeteerHint, completeSingle: true}
 });
+
+// editor.on('drop', (cm, change) => {
+//   editor.value = '';
+// });
 
 // editor.on('inputRead', (cm, change) => {
 //   // hinting logic
@@ -109,48 +114,49 @@ async function runCode() {
   const formData = new FormData();
   formData.append('file', new Blob([code], {type: 'text/javascript'}));
 
-  const url = location.hostname === 'localhost' ? 'http://localhost:8080/run' : 'https://backend-dot-try-puppeteer.appspot.com/run';
+  const url = (location.hostname === 'localhost' ?
+      'http://localhost:8080/run' : 'https://backend-dot-try-puppeteer.appspot.com/run');
   const resp = await fetch(url, {method: 'POST', body: formData});
   return await resp.json();
 }
 
+function isWorking(button, working = true) {
+  const spinner = document.querySelector('.loading-spinner');
+  spinner.classList.toggle('active', working);
+  button.disabled = working;
+
+  if (working) {
+    puppeteerOutput.textContent = '';
+    puppeteerLog.textContent = '';
+  }
+}
+
 const runButton = document.querySelector('#run_button');
 runButton.addEventListener('click', e => {
-  puppeteerOutput.value = '';
-  puppeteerLog.value = '';
+  isWorking(e.target, true);
 
   runCode().then(json => {
+    isWorking(e.target, false);
+
     if (json.errors) {
-      puppeteerLog.value = json.errors;
+      puppeteerLog.textContent = typeof json.errors === 'string' ? json.errors : JSON.stringify(json.errors);
       return;
     }
-    puppeteerLog.value = json.log;
-    puppeteerOutput.value = json.result || '';
+
+    if (json.result) {
+      const uintArray = new Uint8Array(json.result.buffer.data);
+      const blob = new Blob([uintArray], {type: json.result.type});
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(blob);
+      puppeteerOutput.appendChild(img);
+    } else {
+      puppeteerOutput.textContent = json.result || '';
+    }
+
+    puppeteerLog.textContent = json.log;
   }).catch(err => {
-    puppeteerLog.value = err;
-    // eslint-disable-next-line no-console
-    // console.error('Error running your code.', err);
+    puppeteerLog.textContent = err;
+    isWorking(e.target, false);
   });
 });
-
-
-// const source = new EventSource('/stream');
-
-// source.addEventListener('message', e => {
-//   console.log('message', e);
-//   if (e.data.startsWith('done')) {
-//     source.close();
-//   }
-// });
-
-// source.addEventListener('open', e => {
-//   console.log('open', e);
-// });
-
-// source.addEventListener('error', e => {
-//   console.log('error', e);
-//   if (e.readyState === EventSource.CLOSED) {
-//     source.close();
-//   }
-// });
 })();

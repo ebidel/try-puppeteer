@@ -6,10 +6,13 @@
   },
   "scripts": {
     "start": "node src/server.js",
+    "build": "./build.sh",
+    "restart": "docker kill puppeteer-chrome; yarn build && yarn serve",
     "serve": "docker run --rm -d -p 8080:8080 --name puppeteer-chrome puppeteer-chrome-linux yarn start"
   },
   "dependencies": {
     "express": "^4.15.4",
+    "mime": "^1.4.0",
     "multer": "^1.3.0"
   }
 }

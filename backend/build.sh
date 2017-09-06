@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build -t puppeteer-chrome-linux .
+docker build --build-arg CACHEBUST=$(date +%d) -t puppeteer-chrome-linux .

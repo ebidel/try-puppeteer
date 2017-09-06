@@ -32,12 +32,18 @@ Unless required by applicable law or agreed to in writing, software distributed 
 (async () => {
 
 const browser = await puppeteer.launch({
-  args: ['--no-sandbox'], // Note: only needed for the playground
+  args: ['--no-sandbox'], // needed for this playground
   // executablePath: 'google-chrome-unstable'
 });
-console.log(await browser.version());
+//console.log(await browser.version());
 const page = await browser.newPage();
 await page.goto('https://example.com');
+
+//const fs = require('fs');
+//const f = fs.readFileSync('example.png');
+
+await page.screenshot({path: 'example.png'});
+
 console.log(await page.content());
 browser.close();
 
@@ -53,7 +59,14 @@ browser.close();
 
     </header>
     <div class="puppeteer-results layout vertical flex">
-      <output class="puppeteer-result-log"></output>
+      <div class="puppeteer-results-top layout vertical">
+        <div class="loading-spinner-container">
+          <svg class="loading-spinner" width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+            <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+          </svg>
+        </div>
+        <output class="puppeteer-result-log"></output>
+      </div>
       <output class="puppeteer-result-output"></output>
     </div>
   </section>
@@ -74,6 +87,7 @@ browser.close();
 <script src="/codemirror/addon/comment/comment.js"></script>
 <script src="/codemirror/addon/hint/show-hint.js"></script>
 <script src="/codemirror/addon/hint/javascript-hint.js"></script>
+<script src="/codemirror/keymap/sublime.js"></script>
 <!-- <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

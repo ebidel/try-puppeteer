@@ -48,6 +48,7 @@ Start the server:
 ```sh
 cd backend
 yarn serve
+# yarn restart is handy too
 ```
 
 **Example** - running a Puppeteer script

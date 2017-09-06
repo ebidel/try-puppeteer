@@ -1,12 +1,15 @@
 'use strict';
 
+const fs = require('fs');
 const express = require('express');
 const {spawn} = require('child_process');
-// const bodyParser = require('body-parser');
+const mime = require('mime');
 const upload = require('multer')();
 
 const vm = require('vm');
 // const puppeteer = require('../node_modules/puppeteer'); // Need puppeteer in this context, when we spawn node.
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // async function runCode(code) {
 //   // console.log(code);
@@ -60,37 +63,61 @@ app.post('/run', upload.single('file'), async (req, res, next) => {
   //   return res.status(500).send({log: `Error running your code. ${e}`});
   // }
 
-  // console.log(global);
-
   // code = `
-  // (function(require) {
+  // ((require) => {
   //   ${code}
   // })`;
-  // const result = vm.runInThisContext(code)(require);
+
+  // // const result = vm.runInThisContext(code)(require);
+  // const result = await vm.runInNewContext(code, {require});
   // console.log(result);
+  // res.status(200).send(result);
 
-  const cmd = spawn('node', ['-e', code]);
-
-  const log = [];
-  const errors = [];
-  cmd.stdout.on('data', (data) => {
-    log.push(data);
+  // TODO: do more than this to cleanup + prevent malicious deeds.
+  const createdFile = new Promise((resolve, reject) => {
+    const watcher = fs.watch('./', {recursive: true}, (eventType, filename) => {
+      watcher.close();
+      resolve(filename);
+    });
   });
 
-  cmd.stderr.on('data', (data) => {
-    errors.push(data);
-  });
+  try {
+    const cmd = spawn('node', ['-e', code]);
 
-  cmd.on('close', (code) => {
-    // console.log(`child process exited with code ${code}`);
-    const respObj = {
-      log: log.join('\n')
-    };
-    if (errors.length) {
-      respObj.errors = errors.join('\n');
-    }
-    res.status(200).send(respObj);
-  });
+    const log = [];
+    cmd.stdout.on('data', data => {
+      log.push(data);
+    });
+
+    cmd.stderr.on('data', data => {
+      if (!res.headersSent) {
+        res.status(200).send({errors: data.toString()});
+      }
+    });
+
+    cmd.on('close', async code => {
+      try {
+        const respObj = {log: log.join('\n')};
+
+        // Wait a max of 150ms for a file to be created. The race is necessary
+        // because fileCreated will never resolve if the user's code never
+        // attemptes to create a file.
+        const filename = await Promise.race([createdFile, sleep(150)]);
+        if (filename) {
+          respObj.result = {
+            type: mime.lookup(filename),
+            buffer: fs.readFileSync(filename)
+          };
+          fs.unlinkSync(filename); // Remove the file that the user created.
+        }
+        res.status(200).send(respObj);
+      } catch (e) {
+        throw e;
+      }
+    });
+  } catch (e) {
+    res.status(500).send({errors: e});
+  }
 });
 
 const PORT = process.env.PORT || 8080;

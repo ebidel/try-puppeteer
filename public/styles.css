@@ -95,6 +95,9 @@ section footer {
 /* .result-section header {
    background: #eee;
 } */
+.puppeteer-results-top {
+  height: 100%;
+}
 .puppeteer-result-log, .puppeteer-result-output {
   padding: var(--default-padding);
   padding-top: calc(var(--default-padding) * 3);
@@ -113,8 +116,10 @@ section footer {
   right: 0;
   padding: var(--default-padding);
 }
+.puppeteer-result-output img {
+  max-width: 100%;
+}
 .puppeteer-result-log {
-  height: 300%;
   border-bottom: 5px solid var(--shell-color);
 }
 .puppeteer-result-output::before {
@@ -130,7 +135,7 @@ section footer {
   content: '';
   position: absolute;
   background: url('https://user-images.githubusercontent.com/10379601/29446482-04f7036a-841f-11e7-9872-91d1fc2ea683.png') no-repeat 50% 50%;
-  background-size: 40%;
+  background-size: 25%;
   /* background-attachment: fixed; */
   height: 100%;
   width: 100%;
@@ -148,7 +153,7 @@ section footer {
   bottom: 56px;
   margin-bottom: calc(var(--default-padding) * 2);
   position: absolute;
-  background-color: var(--material-blue-grey-300);
+  background-color: var(--material-blue-grey-800);
   color: #fff;
   border: none;
   font: inherit;
@@ -157,6 +162,9 @@ section footer {
   cursor: pointer;
   outline: none;
   z-index: 100;
+}
+#run_button[disabled] {
+  opacity: 0.6;
 }
 #run_button img {
   height: 24px;
@@ -190,4 +198,67 @@ section footer {
   height: 100%;
   position: absolute;
   z-index: 5;
+}
+
+.loading-spinner-container {
+  --logo-size: 40px;
+  position: relative;
+  left: calc(50% - var(--logo-size) / 2);
+  top: calc(50% - var(--logo-size) / 2);
+}
+
+.loading-spinner {
+  position: absolute;
+  animation: rotator 1.4s linear infinite;
+  display: none;
+  width: var(--logo-size);
+  height: var(--logo-size);
+}
+.loading-spinner.active {
+  display: block;
+}
+
+@keyframes rotator {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(270deg);
+  }
+}
+.path {
+  stroke-dasharray: 187;
+  stroke-dashoffset: 0;
+  transform-origin: center;
+  animation: dash 1.4s ease-in-out infinite, colors 5.6s ease-in-out infinite;
+}
+@keyframes colors {
+  0% {
+    stroke: #4285F4;
+  }
+  25% {
+    stroke: #DE3E35;
+  }
+  50% {
+    stroke: #F7C223;
+  }
+  75% {
+    stroke: #1B9A59;
+  }
+  100% {
+    stroke: #4285F4;
+  }
+}
+@keyframes dash {
+  0% {
+    stroke-dashoffset: 187;
+  }
+  50% {
+    stroke-dashoffset: 46.75;
+    transform: rotate(135deg);
+  }
+  100% {
+    stroke-dashoffset: 187;
+    transform: rotate(450deg);
+  }
 }

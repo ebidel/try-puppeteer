@@ -23,9 +23,13 @@ apt-get install -y google-chrome-unstable
 COPY package.json /
 RUN yarn
 
+# Uncomment to skip the chromium download when installing puppeteer.
+# ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
 # Install puppeteer so it can be required by user code that gets ran in server.js.
+# cache bust so we always get the latest version of puppeteer when building the image.
+ARG CACHEBUST=1
 RUN yarn add puppeteer
-# RUN rm -rf /node_modules/puppeteer/.local-chromium
 
 COPY src /src/
 
