@@ -100,11 +100,13 @@ section footer {
 }
 .puppeteer-result-log, .puppeteer-result-output {
   padding: var(--default-padding);
-  padding-top: calc(var(--default-padding) * 3);
   position: relative;
   white-space: pre;
   height: 100%;
   overflow: auto;
+}
+.puppeteer-result-output {
+  padding-top: calc(var(--default-padding) * 3);
 }
 .puppeteer-result-log::before, .puppeteer-result-output::before {
   font-size: 24px;
@@ -118,6 +120,11 @@ section footer {
 }
 .puppeteer-result-output img {
   max-width: 100%;
+}
+.puppeteer-result-output iframe {
+  border: 0;
+  height: 100%;
+  width: 100%;
 }
 .puppeteer-result-log {
   border-bottom: 5px solid var(--shell-color);
@@ -150,7 +157,7 @@ section footer {
   flex-shrink: 0;
   align-self: flex-end;
   /* justify-content: flex-end; */
-  bottom: 56px;
+  top: calc(56px * 2);
   margin-bottom: calc(var(--default-padding) * 2);
   position: absolute;
   background-color: var(--material-blue-grey-800);

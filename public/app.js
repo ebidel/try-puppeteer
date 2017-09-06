@@ -139,16 +139,26 @@ runButton.addEventListener('click', e => {
     isWorking(e.target, false);
 
     if (json.errors) {
-      puppeteerLog.textContent = typeof json.errors === 'string' ? json.errors : JSON.stringify(json.errors);
+      if (typeof json.errors === 'string') {
+        puppeteerLog.textContent = json.errors;
+      } else {
+        puppeteerLog.textContent = JSON.stringify(json.errors);
+      }
       return;
     }
 
     if (json.result) {
       const uintArray = new Uint8Array(json.result.buffer.data);
       const blob = new Blob([uintArray], {type: json.result.type});
-      const img = document.createElement('img');
-      img.src = URL.createObjectURL(blob);
-      puppeteerOutput.appendChild(img);
+      if (blob.type.match(/^image/)) {
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(blob);
+        puppeteerOutput.appendChild(img);
+      } else if (blob.type.match(/pdf$/)) {
+        const iframe = document.createElement('iframe');
+        iframe.src = URL.createObjectURL(blob);
+        puppeteerOutput.appendChild(iframe);
+      }
     } else {
       puppeteerOutput.textContent = json.result || '';
     }

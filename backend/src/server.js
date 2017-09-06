@@ -5,39 +5,94 @@ const express = require('express');
 const {spawn} = require('child_process');
 const mime = require('mime');
 const upload = require('multer')();
-
 const vm = require('vm');
-// const puppeteer = require('../node_modules/puppeteer'); // Need puppeteer in this context, when we spawn node.
+const puppeteer = require('../node_modules/puppeteer');
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// async function runCode(code) {
-//   // console.log(code);
-//   // return safeEval('const x = 5', puppeteer);
+function setupFileCreationWatcher() {
+  // TODO: do more than this to cleanup + prevent malicious deeds.
+  return new Promise((resolve, reject) => {
+    const watcher = fs.watch('./', {recursive: true}, (eventType, filename) => {
+      watcher.close();
+      resolve(filename);
+    });
+  });
+}
 
-//   // const logger = {log: console.log, error: console.error, info: console.info, warn: console.warn};
+/**
+ * @param {!Promise<string>} fileCreated
+ * @param {!Array<string>} log
+ * @return {!Promise<!Object>}
+ */
+async function buildResponse(fileCreated, log) {
+  const respObj = {log: log.join('\\n')};
 
-//   code = `
-//   const log = [];
+  // If a screenshot/pdf was saved, get its filename and mimetype.
+  // Wait a max of 100ms for a file to be created. The race is necessary
+  // because the promise may never never resolve if the user's code never
+  // attempts to create a file.
+  const filename = await Promise.race([fileCreated, sleep(100)]);
+  if (filename) {
+    respObj.result = {
+      type: mime.lookup(filename),
+      buffer: fs.readFileSync(filename)
+    };
+    fs.unlinkSync(filename); // Remove the file that the user created.
+  }
+  return respObj;
+}
 
-//   console.log = (...args) => log.push(args);
+/**
+ * @param {string} code User code to run.
+ * @return {!Promise}
+ */
+function runCodeInSandbox(code) {
+  code = `
+    const log = [];
 
-//   // Wrap user's code in an async function.
-//   (async() => {
-//     async function runUserCode() {
+    // Define inline functions and capture user console logs.
+    const logger = (...args) => log.push(args);
+    console.log = logger;
+    console.info = logger;
+    console.warn = logger;
+
+    const sleep = ${sleep.toString()}; // inline function
+    const fileCreated = ${setupFileCreationWatcher.toString()}(); // inline function
+
+    // Wrap user code in an async function so async/await can be used out of the box.
+    (async() => {
+      ${code}
+      return ${buildResponse.toString()}(fileCreated, log); // inline function, call it
+    })();
+  `;
+
+  // Sandbox user code. Provide new context with limited scope.
+  return vm.runInNewContext(code, {puppeteer, fs, mime, setTimeout});
+}
+
+// /**
+//  * @param {string} code User code to run.
+//  * @return {!Promise}
+//  */
+// function runCodeUsingSpawn(code) {
+//   return new Promise((resolve, reject) => {
+//     const createdFile = setupFileCreationWatcher();
+
+//     // Wrap user code in an async function so async/await can be used out of the box.
+//     code = `(async() => {
 //       ${code}
-//     };
-//     const result = await runUserCode();
+//     })();`;
 
-//     return {result, log: log.join('\\n')};
-//   })();
-//   `;
+//     const log = [];
+//     const cmd = spawn('node', ['-e', code]);
+//     cmd.stdout.on('data', data => log.push(data));
+//     cmd.stderr.on('data', data => log.push(data));
 
-//   // Promiseify expression no matter what user returns.
-//   const promise = Promise.resolve();
-//   return await promise.then(() => vm.runInNewContext(code, {puppeteer, require, console}));
-//   // const result = eval(code);
-//   // return sandbox[resultKey]
+//     cmd.on('close', processCode => {
+//       resolve(buildResponse(createdFile, log));
+//     });
+//   });
 // }
 
 const app = express();
@@ -54,69 +109,12 @@ app.get('/', (req, res, next) => {
 });
 
 app.post('/run', upload.single('file'), async (req, res, next) => {
-  let code = req.file.buffer.toString();
-
-  // try {
-  //   const result = await runCode(code);
-  //   res.status(200).send(result);
-  // } catch (e) {
-  //   return res.status(500).send({log: `Error running your code. ${e}`});
-  // }
-
-  // code = `
-  // ((require) => {
-  //   ${code}
-  // })`;
-
-  // // const result = vm.runInThisContext(code)(require);
-  // const result = await vm.runInNewContext(code, {require});
-  // console.log(result);
-  // res.status(200).send(result);
-
-  // TODO: do more than this to cleanup + prevent malicious deeds.
-  const createdFile = new Promise((resolve, reject) => {
-    const watcher = fs.watch('./', {recursive: true}, (eventType, filename) => {
-      watcher.close();
-      resolve(filename);
-    });
-  });
-
+  const code = req.file.buffer.toString();
   try {
-    const cmd = spawn('node', ['-e', code]);
-
-    const log = [];
-    cmd.stdout.on('data', data => {
-      log.push(data);
-    });
-
-    cmd.stderr.on('data', data => {
-      if (!res.headersSent) {
-        res.status(200).send({errors: data.toString()});
-      }
-    });
-
-    cmd.on('close', async code => {
-      try {
-        const respObj = {log: log.join('\n')};
-
-        // Wait a max of 150ms for a file to be created. The race is necessary
-        // because fileCreated will never resolve if the user's code never
-        // attemptes to create a file.
-        const filename = await Promise.race([createdFile, sleep(150)]);
-        if (filename) {
-          respObj.result = {
-            type: mime.lookup(filename),
-            buffer: fs.readFileSync(filename)
-          };
-          fs.unlinkSync(filename); // Remove the file that the user created.
-        }
-        res.status(200).send(respObj);
-      } catch (e) {
-        throw e;
-      }
-    });
+    const result = await runCodeInSandbox(code); // await runCodeUsingSpawn(code);
+    res.status(200).send(result);
   } catch (e) {
-    res.status(500).send({errors: e});
+    res.status(500).send({errors: `Error running your code. ${e}`});
   }
 });
 

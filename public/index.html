@@ -27,9 +27,8 @@ Unless required by applicable law or agreed to in writing, software distributed 
       </a>
     </header>
     <div class="layout vertical flex">
-      <textarea id="code-editor-area">const puppeteer = require('puppeteer');
-
-(async () => {
+      <textarea id="code-editor-area">
+// const puppeteer = require('puppeteer');
 
 const browser = await puppeteer.launch({
   args: ['--no-sandbox'], // needed for this playground
@@ -39,19 +38,18 @@ const browser = await puppeteer.launch({
 const page = await browser.newPage();
 await page.goto('https://example.com');
 
-//const fs = require('fs');
-//const f = fs.readFileSync('example.png');
-
-await page.screenshot({path: 'example.png'});
+//await page.screenshot({path: 'example.png'});
+//await page.pdf({path: 'hn.pdf', format: 'A4'});
 
 console.log(await page.content());
 browser.close();
-
-})();</textarea>
+</textarea>
       <button id="run_button" class="layout center-center">
         <img src="/images/play.svg"> RUN IT
       </button>
-      <footer><b>Protip</b>: drag and drop a .js file onto the code editor.</footer>
+      <footer>
+        <span><b>Protip</b>: drag and drop a .js file onto the code editor.</span>
+      </footer>
     </div>
   </section>
   <section class="result-section layout vertical">
