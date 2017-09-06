@@ -48,7 +48,12 @@ browser.close();
         <img src="/images/play.svg"> RUN IT
       </button>
       <footer>
-        <span><b>Protip</b>: drag and drop a .js file onto the code editor.</span>
+        <cycler-element>
+          <div class="item"><b>Note</b>: There's no need to require('puppeteer') in the editor. It's done for you!</div>
+          <div class="item hiding"><b>Protip</b>: you can use async/await directly in the editor.</div>
+          <div class="item hiding"><b>Note</b>: The playground doesn't support require() calls.</div>
+          <div class="item hiding"><b>Protip</b>: you drag and drop a .js file onto the code editor.</div>
+        </cycler-element>
       </footer>
     </div>
   </section>
@@ -70,14 +75,6 @@ browser.close();
   </section>
 </main>
 
-<!-- <textarea id="logger" readonly aria-hidden="true" tabindex="-1"></textarea> -->
-
-<!-- <footer>
-  <h2>Results powered by <a href="https://github.com/GoogleChrome/lighthouse" target="_blank">Lighthouse</a></h2>
-</footer> -->
-
-<!-- <div id="background"></div> -->
-
 <script src="/codemirror/lib/codemirror.js"></script>
 <script src="/codemirror/mode/javascript/javascript.js"></script>
 <script src="/codemirror/addon/edit/matchbrackets.js"></script>
@@ -86,15 +83,16 @@ browser.close();
 <script src="/codemirror/addon/hint/show-hint.js"></script>
 <script src="/codemirror/addon/hint/javascript-hint.js"></script>
 <script src="/codemirror/keymap/sublime.js"></script>
-<!-- <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+<script src="cycler-element.js"></script>
+<script src="/app.js"></script>
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-85519014-4', 'auto');
-  ga('send', 'pageview');
-</script>  -->
- <script src="/app.js"></script>
+ga('create', 'UA-106086244-1', 'auto');
+ga('send', 'pageview');
+</script>
 </body>
 </html>

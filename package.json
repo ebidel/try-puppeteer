@@ -11,7 +11,6 @@
   "scripts": {
     "start": "node server.js",
     "serve": "PORT=8081 node server.js",
-    "postinstall": "yarn install-backend",
     "build": "cd backend && yarn build",
     "install-backend": "cd backend && yarn",
     "deploy-backend": "gcloud app deploy backend/app.yaml --project try-puppeteer",

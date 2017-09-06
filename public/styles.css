@@ -269,3 +269,21 @@ section footer {
     transform: rotate(450deg);
   }
 }
+
+cycler-element {
+  display: block;
+  position: relative;
+}
+cycler-element .item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: opacity 800ms ease-in-out;
+}
+cycler-element > :not(.hiding) {
+  position: relative;
+}
+
+cycler-element .item.hiding {
+  opacity: 0;
+}

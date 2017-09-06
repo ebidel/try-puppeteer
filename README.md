@@ -9,7 +9,7 @@ Try it: https://try-puppeteer.appspot.com
 Installation:
 
 ```sh
-yarn
+yarn; yarn install-backend
 # or npm i
 ```
 
