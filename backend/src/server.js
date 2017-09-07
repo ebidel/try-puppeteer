@@ -34,7 +34,7 @@ function setupFileCreationWatcher() {
  * @return {!Promise<!Object>}
  */
 async function buildResponse(fileCreated, log) {
-  const respObj = {log: log.join('\\n')};
+  const respObj = {log: log.join('\n')};
 
   // If a screenshot/pdf was saved, get its filename and mimetype.
   // Wait a max of 100ms for a file to be created. The race is necessary

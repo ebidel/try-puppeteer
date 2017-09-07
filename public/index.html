@@ -31,16 +31,16 @@ Unless required by applicable law or agreed to in writing, software distributed 
     </header>
     <div class="layout vertical flex">
       <textarea id="code-editor-area">
-const browser = await puppeteer.launch({
-  //args: ['--no-sandbox'], // needed for this playground
-});
-//console.log(await browser.version());
-const page = await browser.newPage();
-await page.goto('https://news.ycombinator.com/');
+const browser = await puppeteer.launch();
 
-await page.screenshot({path: 'screenshot.png'});
+console.log(`Version: ${await browser.version()}\n`);
+
+const page = await browser.newPage();
+await page.goto('https://example.com');
 
 console.log(await page.content());
+await page.screenshot({path: 'screenshot.png'});
+
 browser.close();
 </textarea>
       <button id="run_button" class="layout center-center">
@@ -59,7 +59,7 @@ browser.close();
   <section class="result-section layout vertical">
     <header>
       <span class="subtitle">Run an example:</span>
-      <select id="examples_list"></select>
+      <select id="examples_list" hidden></select>
     </header>
     <div class="puppeteer-results layout vertical flex">
       <div class="puppeteer-results-top layout vertical">

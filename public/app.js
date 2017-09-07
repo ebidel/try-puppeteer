@@ -211,5 +211,6 @@ fetchExamples().then(() => {
   const filename = 'screenshot.js';
   // switchToExample(filename);
   examplesSelect.value = filename;
+  examplesSelect.hidden = false;
 });
 })();
