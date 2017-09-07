@@ -70,8 +70,23 @@ section {
 .title {
   font-size: 30px;
 }
+.subtitle {
+  font-size: 16px;
+}
 .logo {
-  height: 40px;
+  height: 25px;
+  margin-right: var(--half-default-padding);
+}
+#examples_list {
+  border: none;
+  border-radius: 0;
+  padding: var(--half-default-padding);
+  background: var(--material-blue-grey-600);
+  color: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  outline: none;
   margin-left: var(--half-default-padding);
 }
 section header {
@@ -92,30 +107,22 @@ section footer {
 .code-editor-section header {
   padding: 0 var(--default-padding);
 }
-/* .result-section header {
-   background: #eee;
-} */
 .puppeteer-results-top {
-  height: 100%;
+  height: 250%;
 }
 .puppeteer-result-log, .puppeteer-result-output {
   padding: var(--default-padding);
+  padding-top: 0;
   position: relative;
   white-space: pre;
   height: 100%;
   overflow: auto;
 }
-.puppeteer-result-output {
-  padding-top: calc(var(--default-padding) * 3);
-}
-.puppeteer-result-log::before, .puppeteer-result-output::before {
+.puppeteer-result-label {
   font-size: 24px;
   color: var(--shell-color);
   text-transform: uppercase;
   line-height: 1;
-  position: absolute;
-  top: 0;
-  right: 0;
   padding: var(--default-padding);
 }
 .puppeteer-result-output img {
@@ -129,26 +136,16 @@ section footer {
 .puppeteer-result-log {
   border-bottom: 5px solid var(--shell-color);
 }
-.puppeteer-result-output::before {
-  content: 'Result';
-}
-.puppeteer-result-log::before {
-  content: 'Log';
-}
-.puppeteer-results {
-  position: relative;
-}
 .puppeteer-result-log::after {
   content: '';
   position: absolute;
-  background: url('https://user-images.githubusercontent.com/10379601/29446482-04f7036a-841f-11e7-9872-91d1fc2ea683.png') no-repeat 50% 50%;
-  background-size: 25%;
-  /* background-attachment: fixed; */
+  background: url('https://user-images.githubusercontent.com/10379601/29446482-04f7036a-841f-11e7-9872-91d1fc2ea683.png') no-repeat 50% calc(50% - 56px);
+  background-size: 35%;
   height: 100%;
   width: 100%;
   top: 0;
   left: 0;
-  opacity: 0.03;
+  opacity: 0.05;
   z-index: -1;
 }
 #run_button {

@@ -19,9 +19,13 @@
 (() => {
 'use strict';
 
+const BACKEND_HOST = (location.hostname === 'localhost' ?
+  'http://localhost:8080' : 'https://backend-dot-try-puppeteer.appspot.com');
+
 const textarea = document.querySelector('#code-editor-area');
 const puppeteerOutput = document.querySelector('.puppeteer-result-output');
 const puppeteerLog = document.querySelector('.puppeteer-result-log');
+const examplesSelect = document.querySelector('#examples_list');
 
 const editor = CodeMirror.fromTextArea(textarea, {
   lineNumbers: true,
@@ -104,20 +108,49 @@ function puppeteerHint(cm) {
 // editor.addLineClass(0, 'wrap', 'readonly-line');
 
 async function runCode() {
-  const code = editor.getValue();
+  let code = editor.getValue();
+
+  // Linux requires --no-sandbox. Replace lauch call with our own.
+  code = code.replace(/\.launch\(((.|\n)*?)\)/g, '.launch({args: ["--no-sandbox"]})');
 
   if (!/["|']--no-sandbox['|"]/.test(code)) {
-    throw Error('This playground requires the --no-sandbox flag when launching Chrome. ' +
+    throw Error('This   playground requires the --no-sandbox flag when launching Chrome. ' +
                 `Please use puppeteer.launch({args: ['--no-sandbox']})`);
   }
 
   const formData = new FormData();
   formData.append('file', new Blob([code], {type: 'text/javascript'}));
 
-  const url = (location.hostname === 'localhost' ?
-      'http://localhost:8080/run' : 'https://backend-dot-try-puppeteer.appspot.com/run');
-  const resp = await fetch(url, {method: 'POST', body: formData});
+  const resp = await fetch(`${BACKEND_HOST}/run`, {method: 'POST', body: formData});
   return await resp.json();
+}
+
+async function fetchExamples() {
+  const resp = await fetch(`${BACKEND_HOST}/examples`);
+  const list = await resp.json();
+  list.forEach(item => {
+    const option = document.createElement('option');
+    option.text = item;
+    examplesSelect.add(option);
+  });
+}
+
+async function switchToExample(filename) {
+  const resp = await fetch(`${BACKEND_HOST}/${filename}`);
+  let code = await resp.text();
+
+  // console.log(editor.getDoc())
+  // const match = code.match(/\(async\(\) => {((\n|.)*)}\)\(\)/, '');
+  // if (match) {
+  //   code = match[1].trim();
+  // }
+  code = code.replace(/["']use strict["'];/, ''); // Remove.
+  code = code.replace(/^\/\*\*((\n|.)*)Copyright \d{4}(\n|.)*?\*\//g, ''); // Remove copyright.
+  code = code.replace(/^((.*)require\('puppeteer'\);).*$/gm, ''); // Comment out puppeteer require.
+  code = code.replace(/\(\s*async\s*\(\s*\)\s*=>\s*{\s*$/gm, ''); // remove start of async IIFE.
+  code = code.replace(/^}\)\(\);\s*$/gm, ''); // remove end of async IIFE.
+
+  editor.getDoc().setValue(code.trim());
 }
 
 function isWorking(button, working = true) {
@@ -130,6 +163,10 @@ function isWorking(button, working = true) {
     puppeteerLog.textContent = '';
   }
 }
+
+examplesSelect.addEventListener('change', e => {
+  switchToExample(e.target.value);
+});
 
 const runButton = document.querySelector('#run_button');
 runButton.addEventListener('click', e => {
@@ -168,5 +205,11 @@ runButton.addEventListener('click', e => {
     puppeteerLog.textContent = err;
     isWorking(e.target, false);
   });
+});
+
+fetchExamples().then(() => {
+  const filename = 'screenshot.js';
+  // switchToExample(filename);
+  examplesSelect.value = filename;
 });
 })();

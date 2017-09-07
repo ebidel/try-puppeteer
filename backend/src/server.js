@@ -2,13 +2,21 @@
 
 const fs = require('fs');
 const express = require('express');
-const {spawn} = require('child_process');
+// const {spawn} = require('child_process');
 const mime = require('mime');
 const upload = require('multer')();
 const vm = require('vm');
 const puppeteer = require('../node_modules/puppeteer');
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+function listExamples() {
+  const dirname = '../node_modules/puppeteer/examples/';
+  const examples = fs.readdirSync(dirname).filter(filename => !filename.startsWith('.'));
+  return examples;
+}
+
+listExamples();
 
 function setupFileCreationWatcher() {
   // TODO: do more than this to cleanup + prevent malicious deeds.
@@ -62,13 +70,18 @@ function runCodeInSandbox(code) {
 
     // Wrap user code in an async function so async/await can be used out of the box.
     (async() => {
-      ${code}
+      try {
+        ${code} // user's code
+      } catch (err) {
+        log.push(err);
+      }
+
       return ${buildResponse.toString()}(fileCreated, log); // inline function, call it
     })();
   `;
 
   // Sandbox user code. Provide new context with limited scope.
-  return vm.runInNewContext(code, {puppeteer, fs, mime, setTimeout});
+  return vm.runInNewContext(code, {puppeteer, fs, mime, setTimeout, process});
 }
 
 // /**
@@ -96,16 +109,22 @@ function runCodeInSandbox(code) {
 // }
 
 const app = express();
-
 app.use(function cors(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
+  const dev = req.hostname.includes('localhost');
+  const origin = dev ? 'http://localhost:8081': 'https://try-puppeteer.appspot.com';
+  res.header('Access-Control-Allow-Origin', origin);
   // res.header('Content-Type', 'application/json;charset=utf-8');
   // res.header('Cache-Control', 'private, max-age=300');
   next();
 });
+app.use(express.static('../node_modules/puppeteer/examples/'));
 
 app.get('/', (req, res, next) => {
   res.status(200).send('It works!');
+});
+
+app.get('/examples', (req, res, next) => {
+  res.status(200).json(listExamples());
 });
 
 app.post('/run', upload.single('file'), async (req, res, next) => {

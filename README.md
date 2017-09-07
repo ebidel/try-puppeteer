@@ -103,7 +103,7 @@ yarn deploy-backend
 
 ## Notes & Limitations
 
-- The container runs Chrome Linux, which need sto be run with the `--no-sandbox` flag:
+- The container runs Chrome Linux, which need to be run with the `--no-sandbox` flag:
 
   ```js
   const browser = await puppeteer.launch({args: ['--no-sandbox']});

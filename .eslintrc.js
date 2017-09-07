@@ -19,7 +19,7 @@ module.exports = {
     "indent": [2, 2, {
       "SwitchCase": 1,
       "VariableDeclarator": 2,
-      "MemberExpression": 1,
+      "MemberExpression": 2,
       "outerIIFEBody": 0
     }],
     "max-len": [2, 100, {
