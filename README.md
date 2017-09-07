@@ -97,7 +97,9 @@ Then navigate to `http://localhost:8081`.
 
 ## Deployment
 
-`yarn deploy` deploys both the frontend and backend services to App Engine Flex. The
+1. Update the version of Puppeteer used in index.html.
+
+2. `yarn deploy` deploys both the frontend and backend services to App Engine Flex. The
 apps can also be deployed individually:
 
 ```sh

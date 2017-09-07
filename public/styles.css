@@ -38,9 +38,10 @@ a {
   text-decoration: none;
   color: inherit;
 }
-h1, h2, h3 {
+h1, h2, h3, h4 {
   margin: 0;
   font-weight: inherit;
+  line-height: 1;
 }
 main {
   height: 100vh;
@@ -73,9 +74,15 @@ section {
 .subtitle {
   font-size: 16px;
 }
+.version {
+  margin-left: var(--default-padding);
+}
 .logo {
   height: 25px;
   margin-right: var(--half-default-padding);
+}
+.github-logo {
+  height: 25px;
 }
 #examples_list {
   border: none;
@@ -104,8 +111,13 @@ section footer {
 .code-editor-section {
   background: var(--editor-background-color);
 }
-.code-editor-section header {
+.code-editor-section header,
+.result-section header {
   padding: 0 var(--default-padding);
+}
+.result-section header {
+  justify-content: space-between;
+  padding-left: 0;
 }
 .puppeteer-results-top {
   height: 250%;
@@ -139,7 +151,7 @@ section footer {
 .puppeteer-result-log::after {
   content: '';
   position: absolute;
-  background: url('https://user-images.githubusercontent.com/10379601/29446482-04f7036a-841f-11e7-9872-91d1fc2ea683.png') no-repeat 50% calc(50% - 56px);
+  background: url('https://user-images.githubusercontent.com/10379601/29446482-04f7036a-841f-11e7-9872-91d1fc2ea683.png') no-repeat 50% calc(50% - 40px);
   background-size: 35%;
   height: 100%;
   width: 100%;

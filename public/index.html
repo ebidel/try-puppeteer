@@ -28,6 +28,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
         <!-- <img src="https://user-images.githubusercontent.com/10379601/29446482-04f7036a-841f-11e7-9872-91d1fc2ea683.png" class="logo" alt="Puppeteer logo" title="Puppeteer logo"> -->
         <h1 class="title">Try Puppeteer</h1>
       </a>
+      <h4 class="version">v0.10.2</h3>
     </header>
     <div class="layout vertical flex">
       <textarea id="code-editor-area">
@@ -58,8 +59,13 @@ browser.close();
   </section>
   <section class="result-section layout vertical">
     <header>
-      <span class="subtitle">Run an example:</span>
-      <select id="examples_list" hidden></select>
+      <div>
+        <span class="subtitle">Run an example:</span>
+        <select id="examples_list" hidden></select>
+      </div>
+      <div>
+        <a href="https://github.com/ebidel/try-puppeteer" target="_blank"><img src="/images/githublogo.svg" class="github-logo"></a>
+      </div>
     </header>
     <div class="puppeteer-results layout vertical flex">
       <div class="puppeteer-results-top layout vertical">
