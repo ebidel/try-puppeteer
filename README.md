@@ -48,7 +48,7 @@ Start the server:
 ```sh
 cd backend
 yarn serve
-# yarn restart is handy too
+# yarn restart is handy too. It rebuilds the container and starts the server.
 ```
 
 **Example** - running a Puppeteer script
@@ -62,14 +62,11 @@ async function runCode(code) {
 }
 
 const code = `
-  const puppeteer = require('puppeteer');
-  (async () => {
-    const browser = await puppeteer.launch({args: ['--no-sandbox']});
-    const page = await browser.newPage();
-    await page.goto('https://example.com');
-    console.log(await page.content());
-    browser.close();
-  })();
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto('https://example.com');
+  console.log(await page.content());
+  browser.close();
 `;
 
 runCode(code).then(result => {
@@ -79,6 +76,13 @@ runCode(code).then(result => {
   console.log(result.log);
 });
 ```
+
+**Notes**:
+
+- There's no need to `require('puppeteer')`. This is done for you in on the backend.
+- The `--no-sandbox` is automatically added to your `launch()` call. See limitations section below.
+- Top-level async/await are supported.
+
 
 ### Code editor frontend
 
