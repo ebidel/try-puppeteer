@@ -80,8 +80,31 @@ function runCodeInSandbox(code) {
     })();
   `;
 
+  const whitelistRegex = /^(\w|\.\/)+\.(png|jpg|jpeg|pdf)$/m; // Restrict file reads to images, pdfs.
+
   // Sandbox user code. Provide new context with limited scope.
-  return vm.runInNewContext(code, {puppeteer, fs, mime, setTimeout, process});
+  return vm.runInNewContext(code, {
+    puppeteer,
+    fs: {
+      watch: fs.watch,
+      readFileSync: (...args) => {
+        const filename = args[0];
+        if (whitelistRegex.test(filename)) {
+          return fs.readFileSync(...args);
+        }
+        throw Error(`ENOENT: no such file or directory, open '${filename}'`);
+      },
+      unlinkSync: (...args) => {
+        const filename = args[0];
+        if (whitelistRegex.test(filename)) {
+          return fs.unlinkSync(...args);
+        }
+        throw Error(`ENOENT: no such file or directory, open '${filename}'`);
+      }
+    },
+    mime,
+    setTimeout
+  });
 }
 
 // /**
