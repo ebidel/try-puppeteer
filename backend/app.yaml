@@ -2,16 +2,13 @@ runtime: custom
 env: flex
 service: backend
 
-health_check:
-  enable_health_check: False
-
 automatic_scaling:
   min_num_instances: 1
-  max_num_instances: 1
+  max_num_instances: 5
 
 resources:
   cpu: 2
-  memory_gb: 7.5
+  memory_gb: 8
   disk_size_gb: 10
 
 skip_files:
