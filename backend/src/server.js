@@ -35,7 +35,6 @@ function setupFileCreationWatcher() {
  */
 async function buildResponse(fileCreated, log) {
   const respObj = {log: log.join('\n')};
-
   // If a screenshot/pdf was saved, get its filename and mimetype.
   // Wait a max of 100ms for a file to be created. The race is necessary
   // because the promise may never never resolve if the user's code never
@@ -70,41 +69,33 @@ function runCodeInSandbox(code) {
 
     // Wrap user code in an async function so async/await can be used out of the box.
     (async() => {
-      try {
-        ${code} // user's code
-      } catch (err) {
-        log.push(err);
-      }
-
+      ${code} // user's code
       return ${buildResponse.toString()}(fileCreated, log); // inline function, call it
     })();
   `;
 
-  const whitelistRegex = /^(\w|\.\/)+\.(png|jpg|jpeg|pdf)$/m; // Restrict file reads to images, pdfs.
+  const fsFunc = (func, ...args) => {
+    const filename = args[0];
+    // Restrict file reads to images, pdfs.
+    if (/^(\w|\.\/)+\.(png|jpg|jpeg|pdf)$/m.test(filename)) {
+      return func(...args);
+    }
+    throw Error(`ENOENT: no such file or directory, open '${filename}'`);
+  };
 
   // Sandbox user code. Provide new context with limited scope.
-  return vm.runInNewContext(code, {
+  const scope = {
+    mime,
+    setTimeout,
     puppeteer,
     fs: {
       watch: fs.watch,
-      readFileSync: (...args) => {
-        const filename = args[0];
-        if (whitelistRegex.test(filename)) {
-          return fs.readFileSync(...args);
-        }
-        throw Error(`ENOENT: no such file or directory, open '${filename}'`);
-      },
-      unlinkSync: (...args) => {
-        const filename = args[0];
-        if (whitelistRegex.test(filename)) {
-          return fs.unlinkSync(...args);
-        }
-        throw Error(`ENOENT: no such file or directory, open '${filename}'`);
-      }
-    },
-    mime,
-    setTimeout
-  });
+      readFileSync: (...args) => fsFunc(fs.readFileSync, ...args),
+      unlinkSync: (...args) => fsFunc(fs.unlinkSync, ...args)
+    }
+  };
+
+  return vm.runInNewContext(code, scope);
 }
 
 // /**
@@ -152,9 +143,18 @@ app.get('/examples', (req, res, next) => {
 
 app.post('/run', upload.single('file'), async (req, res, next) => {
   const code = req.file.buffer.toString();
+
+  process.on('unhandledRejection', err => {
+    if (!res.headersSent) {
+      res.status(500).send({errors: `Error running your code. ${err}`});
+    }
+  });
+
   try {
     const result = await runCodeInSandbox(code); // await runCodeUsingSpawn(code);
-    res.status(200).send(result);
+    if (!res.headersSent) {
+      res.status(200).send(result);
+    }
   } catch (e) {
     res.status(500).send({errors: `Error running your code. ${e}`});
   }
