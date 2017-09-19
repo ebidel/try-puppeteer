@@ -145,6 +145,7 @@ app.post('/run', upload.single('file'), async (req, res, next) => {
   const code = req.file.buffer.toString();
 
   process.on('unhandledRejection', err => {
+    console.error(err);
     if (!res.headersSent) {
       res.status(500).send({errors: `Error running your code. ${err}`});
     }
@@ -155,8 +156,8 @@ app.post('/run', upload.single('file'), async (req, res, next) => {
     if (!res.headersSent) {
       res.status(200).send(result);
     }
-  } catch (e) {
-    res.status(500).send({errors: `Error running your code. ${e}`});
+  } catch (err) {
+    res.status(500).send({errors: `Error running your code. ${err}`});
   }
 });
 

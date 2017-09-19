@@ -34,8 +34,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
       <textarea id="code-editor-area">
 const browser = await puppeteer.launch();
 
-console.log(`Version: ${await browser.version()}\n`);
-
 const page = await browser.newPage();
 await page.goto('https://example.com');
 
