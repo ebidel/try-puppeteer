@@ -25,6 +25,7 @@ const BACKEND_HOST = (location.hostname === 'localhost' ?
 const textarea = document.querySelector('#code-editor-area');
 const puppeteerOutput = document.querySelector('.puppeteer-result-output');
 const puppeteerLog = document.querySelector('.puppeteer-result-log');
+const resultsPanel = document.querySelector('.puppeteer-results-panel');
 const examplesSelect = document.querySelector('#examples_list');
 
 const editor = CodeMirror.fromTextArea(textarea, {
@@ -185,6 +186,7 @@ runButton.addEventListener('click', e => {
       return;
     }
 
+    // Screenshot/pdf file response.
     if (json.result) {
       const uintArray = new Uint8Array(json.result.buffer.data);
       const blob = new Blob([uintArray], {type: json.result.type});
@@ -197,7 +199,9 @@ runButton.addEventListener('click', e => {
         iframe.src = URL.createObjectURL(blob);
         puppeteerOutput.appendChild(iframe);
       }
+      resultsPanel.classList.add('active');
     } else {
+      resultsPanel.classList.remove('active');
       puppeteerOutput.textContent = json.result || '';
     }
 
@@ -205,6 +209,7 @@ runButton.addEventListener('click', e => {
   }).catch(err => {
     puppeteerLog.textContent = err;
     isWorking(e.target, false);
+    resultsPanel.classList.remove('active');
   });
 });
 

@@ -33,6 +33,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
   margin: 0;
+  overflow: hidden;
 }
 a {
   text-decoration: none;
@@ -73,6 +74,7 @@ section {
 }
 .subtitle {
   font-size: 16px;
+  user-select: none;
 }
 .version {
   margin-left: var(--default-padding);
@@ -119,8 +121,24 @@ section footer {
   justify-content: space-between;
   padding-left: 0;
 }
+.puppeteer-results {
+  position: relative;
+}
 .puppeteer-results-top {
-  height: 250%;
+  height: 100%;
+  position: relative;
+}
+.puppeteer-results-top::after {
+  content: '';
+  position: absolute;
+  background: url('https://user-images.githubusercontent.com/10379601/29446482-04f7036a-841f-11e7-9872-91d1fc2ea683.png') no-repeat 50% 50%;
+  background-size: 45%;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0.05;
+  z-index: -1;
 }
 .puppeteer-result-log, .puppeteer-result-output {
   padding: var(--default-padding);
@@ -129,13 +147,7 @@ section footer {
   white-space: pre;
   height: 100%;
   overflow: auto;
-}
-.puppeteer-result-label {
-  font-size: 24px;
-  color: var(--shell-color);
-  text-transform: uppercase;
-  line-height: 1;
-  padding: var(--default-padding);
+  display: block;
 }
 .puppeteer-result-output img {
   max-width: 100%;
@@ -145,27 +157,33 @@ section footer {
   height: 100%;
   width: 100%;
 }
-.puppeteer-result-log {
-  border-bottom: 5px solid var(--shell-color);
-}
-.puppeteer-result-log::after {
-  content: '';
+.puppeteer-results-panel {
+  transform: translateY(100%);
+  transition: transform 300ms ease-in-out;
+  height: 50%;
+  border-top: 5px solid var(--shell-color);
   position: absolute;
-  background: url('https://user-images.githubusercontent.com/10379601/29446482-04f7036a-841f-11e7-9872-91d1fc2ea683.png') no-repeat 50% calc(50% - 40px);
-  background-size: 35%;
-  height: 100%;
-  width: 100%;
-  top: 0;
+  right: 0;
   left: 0;
-  opacity: 0.05;
-  z-index: -1;
+  bottom: 0;
+  background-color: #fff;
+}
+.puppeteer-results-panel.active {
+  transform: none;
+}
+.puppeteer-result-label {
+  font-size: 24px;
+  color: var(--shell-color);
+  text-transform: uppercase;
+  line-height: 1;
+  padding: var(--default-padding);
+  user-select: none;
 }
 #run_button {
   border-top-left-radius: 3px;
   border-bottom-left-radius: 3px;
   flex-shrink: 0;
   align-self: flex-end;
-  /* justify-content: flex-end; */
   top: calc(56px * 2);
   margin-bottom: calc(var(--default-padding) * 2);
   position: absolute;
@@ -178,6 +196,7 @@ section footer {
   cursor: pointer;
   outline: none;
   z-index: 100;
+  user-select: none;
 }
 #run_button[disabled] {
   opacity: 0.6;
@@ -288,6 +307,7 @@ cycler-element .item {
   top: 0;
   left: 0;
   transition: opacity 800ms ease-in-out;
+  user-select: none;
 }
 cycler-element > :not(.hiding) {
   position: relative;
