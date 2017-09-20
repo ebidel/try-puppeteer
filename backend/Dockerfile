@@ -12,29 +12,43 @@ MAINTAINER Eric Bidelman <ebidel@>
 # libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
 # ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
 
-# Install latest chrome (dev) package.
+# Install latest chrome dev package.
 # Note: this also installs the necessary libs so we don't need the previous RUN command.
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - &&\
-sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' &&\
-apt-get update &&\
-apt-get install -y google-chrome-unstable
+RUN apt-get update && apt-get install -y wget --no-install-recommends \
+    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && apt-get update \
+    && apt-get install -y google-chrome-unstable \
+      --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get purge --auto-remove -y curl \
+    && rm -rf /src/*.deb
+
+COPY . /app/
+#COPY local.conf /etc/fonts/local.conf
+WORKDIR app
 
 # Install deps for server.
-COPY package.json /
 RUN yarn
 
 # Uncomment to skip the chromium download when installing puppeteer.
 # ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
-# Install puppeteer so it can be required by user code that gets ran in server.js.
-# cache bust so we always get the latest version of puppeteer when building the image.
+# Install puppeteer so it can be required by user code that gets run in
+# server.js. Cache bust so we always get the latest version of puppeteer when
+# building the image.
 ARG CACHEBUST=1
 RUN yarn add puppeteer
 
-COPY src /src/
+# Add pptr user.
+RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
+    && mkdir -p /home/pptruser/Downloads \
+    && chown -R pptruser:pptruser /home/pptruser \
+    && chown -R pptruser:pptruser /app
+
+# Run user as non privileged.
+USER pptruser
 
 EXPOSE 8080
 
-# ENTRYPOINT ["/src/entrypoint.sh"]
-# CMD ["google-chrome-unstable", "--no-sandbox"]
 CMD ["yarn", "start"]

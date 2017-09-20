@@ -111,15 +111,6 @@ function puppeteerHint(cm) {
 async function runCode() {
   let code = editor.getValue();
 
-  // Linux requires --no-sandbox. Replace launch call with our own.
-  const launchCall = `.launch({args: ["--no-sandbox"], dumpio: true})`;
-  code = code.replace(/\.launch\(((.|\n)*?)\)/g, launchCall);
-
-  if (!/["|']--no-sandbox['|"]/.test(code)) {
-    throw Error('This playground requires the --no-sandbox flag when launching Chrome. ' +
-                `Please use puppeteer.launch({args: ['--no-sandbox']})`);
-  }
-
   const formData = new FormData();
   formData.append('file', new Blob([code], {type: 'text/javascript'}));
 

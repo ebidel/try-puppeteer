@@ -80,9 +80,7 @@ runCode(code).then(result => {
 **Notes**:
 
 - There's no need to `require('puppeteer')`. This is done for you in on the backend.
-- The `--no-sandbox` is automatically added to your `launch()` call. See limitations section below.
 - Top-level async/await are supported.
-
 
 ### Code editor frontend
 
@@ -108,12 +106,6 @@ yarn deploy-backend
 ```
 
 ## Notes & Limitations
-
-- The container runs Chrome Linux, which need to be run with the `--no-sandbox` flag:
-
-  ```js
-  const browser = await puppeteer.launch({args: ['--no-sandbox']});
-  ```
 
 - By default, Puppeteer launches and uses it's own bundled version of Chromium. To use
   the [`google-chrome-unstable`](https://www.ubuntuupdates.org/ppa/google_chrome) installed by the container, pass `executablePath`:

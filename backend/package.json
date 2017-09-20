@@ -1,14 +1,14 @@
 {
-  "main": "src/server.js",
+  "main": "server.js",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=8"
   },
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node server.js",
     "build": "./build.sh",
     "restart": "docker kill puppeteer-chrome; yarn build && yarn serve",
-    "serve": "docker run --rm -d -p 8080:8080 --name puppeteer-chrome puppeteer-chrome-linux yarn start"
+    "serve": "docker run --rm -d -p 8080:8080 --cap-add=SYS_ADMIN --name puppeteer-chrome puppeteer-chrome-linux yarn start"
   },
   "dependencies": {
     "express": "^4.15.4",

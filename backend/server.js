@@ -6,17 +6,30 @@ const express = require('express');
 const mime = require('mime');
 const upload = require('multer')();
 const vm = require('vm');
-const puppeteer = require('../node_modules/puppeteer');
+const puppeteer = require('puppeteer');
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-function listExamples() {
-  const dirname = '../node_modules/puppeteer/examples/';
-  const examples = fs.readdirSync(dirname).filter(filename => !filename.startsWith('.'));
-  return examples;
+let EXAMPLES_CACHE = [];
+
+async function listExamples() {
+  if (EXAMPLES_CACHE.length) {
+    return EXAMPLES_CACHE;
+  }
+
+  return new Promise((resolve, reject) => {
+    try {
+      const examples = fs.readdirSync('./node_modules/puppeteer/examples/')
+          .filter(filename => !filename.startsWith('.'));
+      EXAMPLES_CACHE = examples;
+      return resolve(examples);
+    } catch (err) {
+      reject(err);
+    }
+  });
 }
 
-listExamples();
+listExamples(); // Populate when server fires up.
 
 function setupFileCreationWatcher() {
   // TODO: do more than this to cleanup + prevent malicious deeds.
@@ -131,14 +144,14 @@ app.use(function cors(req, res, next) {
   // res.header('Cache-Control', 'private, max-age=300');
   next();
 });
-app.use(express.static('../node_modules/puppeteer/examples/'));
+app.use(express.static('./node_modules/puppeteer/examples/'));
 
 app.get('/', (req, res, next) => {
   res.status(200).send('It works!');
 });
 
-app.get('/examples', (req, res, next) => {
-  res.status(200).json(listExamples());
+app.get('/examples', async (req, res, next) => {
+  res.status(200).json(await listExamples());
 });
 
 app.post('/run', upload.single('file'), async (req, res, next) => {
