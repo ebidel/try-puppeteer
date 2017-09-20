@@ -4,6 +4,14 @@ FROM node:8-slim
 
 MAINTAINER Eric Bidelman <ebidel@>
 
+# Run this like so:
+# docker run -i --rm --cap-add=SYS_ADMIN \
+#   --name puppeteer-chrome puppeteer-chrome-linux \
+#    node -e "$file"
+#
+# or run `yarn serve` to start the webservice version.
+#
+
 # # Install missing shared libs for Chromium.
 # RUN apt-get update && \
 # apt-get install -yq gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 \
