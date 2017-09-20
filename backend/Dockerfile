@@ -7,7 +7,7 @@ MAINTAINER Eric Bidelman <ebidel@>
 # Run this like so:
 # docker run -i --rm --cap-add=SYS_ADMIN \
 #   --name puppeteer-chrome puppeteer-chrome-linux \
-#    node -e "$file"
+#    node -e "`cat yourscript.js`"
 #
 # or run `yarn serve` to start the webservice version.
 #
