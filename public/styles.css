@@ -248,6 +248,7 @@ section footer {
   display: none;
   width: var(--logo-size);
   height: var(--logo-size);
+  z-index: 1;
 }
 .loading-spinner.active {
   display: block;
