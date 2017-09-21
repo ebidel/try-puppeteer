@@ -167,7 +167,6 @@ section footer {
   left: 0;
   bottom: 0;
   background-color: #fff;
-  margin-bottom: calc(var(--default-padding) * 2);
 }
 .puppeteer-results-panel.active {
   transform: none;
