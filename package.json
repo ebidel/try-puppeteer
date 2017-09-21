@@ -17,12 +17,12 @@
     "deploy-frontend": "gcloud app deploy app.yaml --project try-puppeteer"
   },
   "dependencies": {
-    "body-parser": "^1.17.2",
-    "codemirror": "^5.28.0",
+    "body-parser": "^1.18.1",
+    "codemirror": "^5.30.0",
     "express": "^4.15.4"
   },
   "devDependencies": {
-    "eslint": "^4.5.0",
+    "eslint": "^4.7.1",
     "eslint-config-google": "^0.9.1"
   }
 }

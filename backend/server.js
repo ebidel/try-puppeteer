@@ -20,7 +20,7 @@ async function listExamples() {
   return new Promise((resolve, reject) => {
     try {
       const examples = fs.readdirSync('./node_modules/puppeteer/examples/')
-          .filter(filename => !filename.startsWith('.'));
+          .filter(filename => !filename.startsWith('.') && filename.endsWith('.js'));
       EXAMPLES_CACHE = examples;
       return resolve(examples);
     } catch (err) {
@@ -55,7 +55,7 @@ async function buildResponse(fileCreated, log) {
   const filename = await Promise.race([fileCreated, sleep(100)]);
   if (filename) {
     respObj.result = {
-      type: mime.lookup(filename),
+      type: mime.getType(filename),
       buffer: fs.readFileSync(filename)
     };
     fs.unlinkSync(filename); // Remove the file that the user created.
