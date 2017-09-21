@@ -40,7 +40,7 @@ await page.goto('https://example.com');
 console.log(await page.content());
 await page.screenshot({path: 'screenshot.png'});
 
-browser.close();
+await browser.close();
 </textarea>
       <button id="run_button" class="layout center-center">
         <img src="/images/play.svg"> RUN IT
