@@ -114,6 +114,10 @@ async function runCode() {
   const formData = new FormData();
   formData.append('file', new Blob([code], {type: 'text/javascript'}));
 
+  if (ga) {
+    ga('send', 'event', 'code', 'run');
+  }
+
   const resp = await fetch(`${BACKEND_HOST}/run`, {method: 'POST', body: formData});
   return await resp.json();
 }
@@ -144,6 +148,10 @@ async function switchToExample(filename) {
   code = code.replace(/^}\)\(\);\s*$/gm, ''); // remove end of async IIFE.
 
   editor.getDoc().setValue(code.trim());
+
+  if (ga) {
+    ga('send', 'event', 'code', 'select_example', filename);
+  }
 }
 
 function isWorking(button, working = true) {
