@@ -157,6 +157,7 @@ app.get('/examples', async (req, res, next) => {
 app.post('/run', upload.single('file'), async (req, res, next) => {
   const code = req.file.buffer.toString();
 
+  // TODO: limit # listeners that can be added. Crashes keep adding more.
   process.on('unhandledRejection', err => {
     console.error(err);
     if (!res.headersSent) {
@@ -170,7 +171,9 @@ app.post('/run', upload.single('file'), async (req, res, next) => {
       res.status(200).send(result);
     }
   } catch (err) {
-    res.status(500).send({errors: `Error running your code. ${err}`});
+    if (!res.headersSent) {
+      res.status(500).send({errors: `Error running your code. ${err}`});
+    }
   }
 });
 
