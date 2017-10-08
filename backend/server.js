@@ -83,6 +83,11 @@ function runCodeInSandbox(code) {
     // Wrap user code in an async function so async/await can be used out of the box.
     (async() => {
       ${code} // user's code
+      // Close the chrome even if user doesn't. This assumes they've used a var
+      // called "browser".
+      if (typeof browser !== 'undefined') {
+        await browser.close();
+      }
       return ${buildResponse.toString()}(fileCreated, log); // inline function, call it
     })();
   `;
