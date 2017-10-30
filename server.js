@@ -19,6 +19,14 @@
 const express = require('express');
 
 const app = express();
+
+app.use(function forceSSL(req, res, next) {
+  if (req.hostname !== 'localhost' && req.get('X-Forwarded-Proto') === 'http') {
+    res.redirect(`https://${req.hostname}${req.url}`);
+  }
+  next();
+});
+
 app.use(express.static('public', {extensions: ['html', 'htm']}));
 app.use(express.static('node_modules'));
 // app.use(bodyParser.urlencoded({extended: true}));
