@@ -112,8 +112,6 @@ async function runCodeInSandbox(code, browser = null) {
     })();
   `;
 
-  console.log(code)
-
   const fsFunc = (func, ...args) => {
     const filename = args[0];
     // Restrict file reads to images, pdfs.
@@ -182,7 +180,7 @@ app.use('/', catchAsyncErrors(async function useChrome(req, res, next) {
 
   const browserWSEndpoint = app.locals.browserWSEndpoint;
   if (browserWSEndpoint) {
-    console.info('Reusing Chrome instance...');
+    // console.info('Reusing Chrome instance...');
     browser = await puppeteer.connect({browserWSEndpoint});
   } else {
     console.info('Starting new Chrome instance...');
