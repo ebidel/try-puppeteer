@@ -5,7 +5,8 @@
     "node": ">=8"
   },
   "scripts": {
-    "start": "node server.js",
+    "start": "node --max_old_space_size=3072 server.js",
+    "debug": "env DEBUG='puppeteer:*' node server.js",
     "build": "./build.sh",
     "restart": "docker kill puppeteer-chrome; yarn build && yarn serve",
     "serve": "docker run --rm -d -p 8080:8080 --cap-add=SYS_ADMIN --name puppeteer-chrome puppeteer-chrome-linux yarn start"

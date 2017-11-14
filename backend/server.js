@@ -8,7 +8,10 @@ const upload = require('multer')();
 const vm = require('vm');
 const puppeteer = require('puppeteer');
 
+const REUSE_CHROME = false;
+
 let EXAMPLES_CACHE = [];
+let unhandledRejectionHandlerAdded = false;
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -75,15 +78,21 @@ async function buildResponse(fileCreated, log) {
  * @return {!Promise}
  */
 async function runCodeInSandbox(code, browser = null) {
-  const browserWSEndpoint = await browser.wsEndpoint();
+  let closeBrowserOrPageCall = 'browser.close();';
 
-  // Rewrite user code to reconnect to Chrome that is already running instead
-  // of launching a new browser instance every run.
-  code = code.replace(/\.launch\([\w\W]*?\)/g,
-      `.connect({browserWSEndpoint: "${browserWSEndpoint}"})`);
+  if (REUSE_CHROME && browser) {
+    const browserWSEndpoint = await browser.wsEndpoint();
 
-  // Replace user code that close the browser.
-  code = code.replace(/(.*\.close\(\))/g, '// $1');
+    // Rewrite user code to reconnect to Chrome that is already running instead
+    // of launching a new browser instance every run.
+    code = code.replace(/\.launch\([\w\W]*?\)/g,
+        `.connect({browserWSEndpoint: "${browserWSEndpoint}"})`);
+
+    // Replace user code that close the browser.
+    code = code.replace(/(.*\.close\(\))/g, '// $1');
+
+    closeBrowserOrPageCall = 'page.close();';
+  }
 
   code = `
     const log = [];
@@ -101,10 +110,10 @@ async function runCodeInSandbox(code, browser = null) {
     (async() => {
       ${code} // user's code
 
-      // Attempt to close the page even if the regex fails to catch the call.
-      // This assumes they've used a var called "page".
+      // Attempt to close the page/browser even if the regex fails to catch the
+      // call. This assumes they've used a var called "page" or "browser".
       try {
-        await page.close();
+        await ${closeBrowserOrPageCall}
       } catch (err) {
         // noop
       }
@@ -160,6 +169,14 @@ async function runCodeInSandbox(code, browser = null) {
 //   });
 // }
 
+function errorHandler(err, req, res, next) {
+  if (res.headersSent) {
+    return next(err);
+  }
+  console.error('errorHandler', err);
+  res.status(500).send({errors: `Error running your code. ${err}`});
+}
+
 const app = express();
 
 // CORSs setup comes before static handler to examples can be loaded x-origin.
@@ -178,21 +195,24 @@ app.use(express.static('./node_modules/puppeteer/examples/'));
 app.use('/', catchAsyncErrors(async function useChrome(req, res, next) {
   let browser;
 
-  const browserWSEndpoint = app.locals.browserWSEndpoint;
-  if (browserWSEndpoint) {
-    // console.info('Reusing Chrome instance...');
-    browser = await puppeteer.connect({browserWSEndpoint});
-  } else {
-    console.info('Starting new Chrome instance...');
-    browser = await puppeteer.launch({headless: true});
-    const pages = await browser.pages();
-    if (pages.length) {
-      await Promise.all(pages.map(page => page.close()));
+  if (REUSE_CHROME) {
+    const browserWSEndpoint = app.locals.browserWSEndpoint;
+    if (browserWSEndpoint) {
+      // console.info('Reusing Chrome instance...');
+      browser = await puppeteer.connect({browserWSEndpoint});
+    } else {
+      console.info('Starting new Chrome instance...');
+      browser = await puppeteer.launch();
+      const pages = await browser.pages();
+      if (pages.length) {
+        await Promise.all(pages.map(page => page.close()));
+      }
+      app.locals.browserWSEndpoint = await browser.wsEndpoint();
     }
-    app.locals.browserWSEndpoint = await browser.wsEndpoint();
+
+    app.locals.browser = browser;
   }
 
-  res.locals.browser = browser;
   next(); // pass control on to middleware/route.
 }));
 
@@ -205,7 +225,7 @@ app.get('/examples', catchAsyncErrors(async (req, res, next) => {
 }));
 
 app.get('/pages', catchAsyncErrors(async (req, res, next) => {
-  const browser = res.locals.browser;
+  const browser = app.locals.browser;
 
   const pages = await browser.pages();
   const pageURLs = await Promise.all(pages.map(page => page.url()));
@@ -216,23 +236,36 @@ app.get('/pages', catchAsyncErrors(async (req, res, next) => {
 }));
 
 app.get('/cleanup', catchAsyncErrors(async (req, res, next) => {
-  const browser = res.locals.browser;
+  const browser = app.locals.browser;
   const pages = await browser.pages();
   await Promise.all(pages.map(page => page.close()));
   res.status(200).send('All pages closed');
 }));
 
 app.post('/run', upload.single('file'), catchAsyncErrors(async (req, res, next) => {
-  const browser = res.locals.browser;
+  const browser = app.locals.browser;
   const code = req.file.buffer.toString();
-  const result = await runCodeInSandbox(code, browser); // await runCodeUsingSpawn(code);
-  res.status(200).send(result);
+
+  // Only add listener once per process.
+  if (!unhandledRejectionHandlerAdded) {
+    process.on('unhandledRejection', err => {
+      console.error('unhandledRejection');
+      next(err, req, res, next);
+    });
+    unhandledRejectionHandlerAdded = true;
+  }
+
+  try {
+    const result = await runCodeInSandbox(code, browser); // await runCodeUsingSpawn(code);
+    if (!res.headersSent) {
+      res.status(200).send(result);
+    }
+  } catch (err) {
+    throw err;
+  }
 }));
 
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).send({errors: `Error running your code. ${err}`});
-})
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
