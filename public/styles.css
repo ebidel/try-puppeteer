@@ -213,7 +213,7 @@ section footer {
 
 /* Codemirror overrides */
 .CodeMirror {
-  font-family: inherit;
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Mono", "Droid Sans Mono", "Source Code Pro", monospace;
   padding: var(--default-padding) 0;
   height: 100%;
 }
