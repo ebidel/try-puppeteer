@@ -80,6 +80,10 @@ async function buildResponse(fileCreated, log) {
 async function runCodeInSandbox(code, browser = null) {
   let closeBrowserOrPageCall = 'browser.close();';
 
+  if (code.match(/file:\/\//g)) {
+    throw new Error('Attempting to access file:// resources.');
+  }
+
   if (REUSE_CHROME && browser) {
     const browserWSEndpoint = await browser.wsEndpoint();
 
@@ -88,7 +92,7 @@ async function runCodeInSandbox(code, browser = null) {
     code = code.replace(/\.launch\([\w\W]*?\)/g,
         `.connect({browserWSEndpoint: "${browserWSEndpoint}"})`);
 
-    // Replace user code that close the browser.
+    // Replace user code that closes the browser.
     code = code.replace(/(.*\.close\(\))/g, '// $1');
 
     closeBrowserOrPageCall = 'page.close();';
