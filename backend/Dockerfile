@@ -12,7 +12,7 @@ MAINTAINER Eric Bidelman <ebidel@>
 # or run `yarn serve` to start the webservice version.
 #
 
-# # Install missing shared libs for Chromium.
+# # Manually install missing shared libs for Chromium.
 # RUN apt-get update && \
 # apt-get install -yq gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 \
 # libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 \
@@ -31,6 +31,9 @@ RUN apt-get update && apt-get install -y wget --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get purge --auto-remove -y curl \
     && rm -rf /src/*.deb
+
+ADD https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64 /usr/local/bin/dumb-init
+RUN chmod +x /usr/local/bin/dumb-init
 
 COPY . /app/
 #COPY local.conf /etc/fonts/local.conf
@@ -59,4 +62,5 @@ USER pptruser
 
 EXPOSE 8080
 
+ENTRYPOINT ["dumb-init", "--"]
 CMD ["yarn", "start"]
