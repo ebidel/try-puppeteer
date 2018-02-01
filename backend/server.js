@@ -96,6 +96,11 @@ async function runCodeInSandbox(code, browser = null) {
     code = code.replace(/(.*\.close\(\))/g, '// $1');
 
     closeBrowserOrPageCall = 'page.close();';
+  } else {
+    // TODO: figure out why this is needed now. User in docker image was
+    // enough before. Possible GAE changed permissions.
+    code = code.replace(/\.launch\([\w\W]*?\)/g,
+        ".launch({args: ['--no-sandbox']})");
   }
 
   code = `
@@ -206,7 +211,7 @@ app.use('/', catchAsyncErrors(async function useChrome(req, res, next) {
       browser = await puppeteer.connect({browserWSEndpoint});
     } else {
       console.info('Starting new Chrome instance...');
-      browser = await puppeteer.launch();
+      browser = await puppeteer.launch({args: ['--no-sandbox']});
       const pages = await browser.pages();
       if (pages.length) {
         await Promise.all(pages.map(page => page.close()));
