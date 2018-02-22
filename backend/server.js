@@ -100,7 +100,7 @@ async function runCodeInSandbox(code, browser = null) {
     // TODO: figure out why this is needed now. User in docker image was
     // enough before. Possible GAE changed permissions.
     code = code.replace(/\.launch\([\w\W]*?\)/g,
-        ".launch({args: ['--no-sandbox']})");
+        ".launch({args: ['--no-sandbox', '--disable-dev-shm-usage']})");
   }
 
   code = `
