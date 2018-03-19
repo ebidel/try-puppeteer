@@ -5,7 +5,7 @@ const express = require('express');
 // const {spawn} = require('child_process');
 const mime = require('mime');
 const upload = require('multer')();
-const vm = require('vm');
+const {VM} = require('vm2');
 const puppeteer = require('puppeteer');
 
 const REUSE_CHROME = false;
@@ -140,7 +140,7 @@ async function runCodeInSandbox(code, browser = null) {
   };
 
   // Sandbox user code. Provide new context with limited scope.
-  const scope = {
+  const sandbox = {
     mime,
     setTimeout,
     puppeteer,
@@ -151,7 +151,10 @@ async function runCodeInSandbox(code, browser = null) {
     }
   };
 
-  return vm.runInNewContext(code, scope);
+  return new VM({
+    timeout: 40 * 1000,
+    sandbox,
+  }).run(code);
 }
 
 // /**
