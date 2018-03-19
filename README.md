@@ -28,11 +28,11 @@ yarn build
 
 #### Running the container
 
-The container can be run in two modes, standalone as an executable or as a web service.
+The container can be run in two modes: standalone as an executable, or as a web service.
 
 **1. Using the standalone CLI**
 
-The first is a "standalone" mode that you can from a Puppeteer script from the CLI. It takes a script file as an argument and runs it in the container.
+The first is a "standalone" mode that runs a Puppeteer script from the CLI. It takes a script file as an argument and runs it in the container.
 
 ```
 ./backend/run_puppeteer.sh your-puppeteer-script.js
@@ -79,7 +79,7 @@ runCode(code).then(result => {
 
 **Notes**:
 
-- There's no need to `require('puppeteer')`. This is done for you in on the backend.
+- There's no need to `require('puppeteer')`. This is done for you on the backend.
 - Top-level async/await are supported.
 
 ### Code editor frontend
@@ -107,7 +107,7 @@ yarn deploy-backend
 
 ## Notes & Limitations
 
-- By default, Puppeteer launches and uses it's own bundled version of Chromium. To use
+- By default, Puppeteer launches and uses its own bundled version of Chromium. To use
   the [`google-chrome-unstable`](https://www.ubuntuupdates.org/ppa/google_chrome) installed by the container, pass `executablePath`:
 
   ```js
