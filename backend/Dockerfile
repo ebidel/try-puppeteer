@@ -1,6 +1,6 @@
 FROM node:8-slim
 
-MAINTAINER Eric Bidelman <ebidel@>
+LABEL maintainer="Eric Bidelman <ebidel@>"
 
 # Run this like so:
 # docker run -i --rm --cap-add=SYS_ADMIN \
