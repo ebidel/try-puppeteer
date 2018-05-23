@@ -27,7 +27,7 @@ async function listExamples() {
 
   return new Promise((resolve, reject) => {
     try {
-      const examples = fs.readdirSync('./node_modules/puppeteer/examples/')
+      const examples = fs.readdirSync('./puppeteer/examples/')
           .filter(filename => !filename.startsWith('.') && filename.endsWith('.js'));
       EXAMPLES_CACHE = examples;
       return resolve(examples);
@@ -201,7 +201,7 @@ app.use(function cors(req, res, next) {
   next(); // pass control on to middleware/route.
 });
 
-app.use(express.static('./node_modules/puppeteer/examples/'));
+app.use(express.static('./puppeteer/examples/'));
 
 // Reuse existing chrome for /run route.
 app.use('/', catchAsyncErrors(async function useChrome(req, res, next) {

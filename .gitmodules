@@ -1,0 +1,3 @@
+[submodule "backend/puppeteer"]
+	path = backend/puppeteer
+	url = https://github.com/GoogleChrome/puppeteer

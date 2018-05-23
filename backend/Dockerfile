@@ -19,7 +19,8 @@ LABEL maintainer="Eric Bidelman <ebidel@>"
 # ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
 
 # See https://crbug.com/795759
-RUN apt-get update && apt-get install -yq libgconf-2-4
+RUN apt-get update && apt-get -yq upgrade && apt-get install \
+    && apt-get autoremove && apt-get autoclean
 
 # Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer

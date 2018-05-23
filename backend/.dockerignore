@@ -6,3 +6,5 @@ Dockerfile
 .git
 .hg
 .svn
+puppeteer/**/*
+!puppeteer/examples/*
