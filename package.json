@@ -6,7 +6,7 @@
   "author": "Eric Bidelman <ebidel@gmail.com>",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=10"
+    "node": ">=8"
   },
   "scripts": {
     "start": "node server.js",

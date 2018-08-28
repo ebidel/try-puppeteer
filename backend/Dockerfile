@@ -1,4 +1,4 @@
-FROM node:10-slim
+FROM node:8-slim
 
 LABEL maintainer="Eric Bidelman <ebidel@>"
 
