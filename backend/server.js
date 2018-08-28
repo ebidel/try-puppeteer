@@ -84,8 +84,6 @@ async function runCodeInSandbox(code, browser = null) {
     throw new Error('Attempting to access file:// resources.');
   }
 
-  //('http://metadata.google.internal/
-
   const lines = code.split('\n');
   const launchLine = lines.findIndex(line => line.includes('.launch('));
   if (launchLine != -1) {
