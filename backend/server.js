@@ -80,8 +80,28 @@ async function buildResponse(fileCreated, log) {
 async function runCodeInSandbox(code, browser = null) {
   let closeBrowserOrPageCall = 'browser.close();';
 
-  if (code.match(/file:\/\//g)) {
+  if (code.match(/file:/g)) {
     throw new Error('Attempting to access file:// resources.');
+  }
+
+  const lines = code.split('\n');
+  const launchLine = lines.findIndex(line => line.includes('.launch('));
+  if (launchLine != -1) {
+    const targetWatchCode = `
+    browser.on('targetcreated', async target => {
+      const page = await target.page();
+      await page.setRequestInterception(true);
+      page.on('request', req => {
+        if (req.url().startsWith('file')) {
+          req.abort();
+        } else {
+          req.continue();
+        }
+      });
+    });`;
+
+    lines.splice(launchLine + 1, 0, targetWatchCode);
+    code = lines.join('\n');
   }
 
   if (REUSE_CHROME && browser) {

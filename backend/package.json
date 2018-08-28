@@ -2,7 +2,7 @@
   "main": "server.js",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=8"
+    "node": ">=10"
   },
   "scripts": {
     "start": "node server.js",
