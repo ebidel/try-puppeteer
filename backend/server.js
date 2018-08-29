@@ -80,8 +80,8 @@ async function buildResponse(fileCreated, log) {
 async function runCodeInSandbox(code, browser = null) {
   let closeBrowserOrPageCall = 'browser.close();';
 
-  if (code.match(/file:/g)) {
-    throw new Error('Attempting to access file:// resources.');
+  if (code.match(/file:/g) || code.match(/metadata\.google\.internal/g)) {
+    throw new Error('Sorry. Cannot access that URL.');
   }
 
   const lines = code.split('\n');
