@@ -123,6 +123,7 @@ section footer {
 }
 .puppeteer-results {
   position: relative;
+  min-height: 0; /* github.com/ebidel/try-puppeteer/issues/36*/
 }
 .puppeteer-results-top {
   height: 100%;
