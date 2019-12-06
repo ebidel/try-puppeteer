@@ -214,7 +214,7 @@ section footer {
 
 /* Codemirror overrides */
 .CodeMirror {
-  font-family: inherit;
+  font-family: 'Menlo', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
   padding: var(--default-padding) 0;
   height: 100%;
 }
