@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "body-parser": "^1.18.3",
-    "codemirror": "^5.41.0",
+    "codemirror": "^5.58.2",
     "express": "^4.16.4"
   },
   "devDependencies": {
