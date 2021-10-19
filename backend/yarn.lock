@@ -535,10 +535,10 @@ vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
 
-vm2@^3.6.4:
-  version "3.6.4"
-  resolved "https://registry.yarnpkg.com/vm2/-/vm2-3.6.4.tgz#88b27a9f328a0630671841363692a57d24dead33"
-  integrity sha512-LFj8YL9DyGn+fwgG2J+10HyuIpdIRHHN8/3NwKoc2e2t2Pr0aXV/2OSODceDR7NP7VNr8RTqmxHRYcwbNvpbwg==
+vm2@^3.9.4:
+  version "3.9.4"
+  resolved "https://registry.yarnpkg.com/vm2/-/vm2-3.9.4.tgz#2e118290fefe7bd8ea09ebe2f5faf53730dbddaa"
+  integrity sha512-sOdharrJ7KEePIpHekiWaY1DwgueuiBeX/ZBJUPgETsVlJsXuEx0K0/naATq2haFvJrvZnRiORQRubR0b7Ye6g==
 
 xtend@^4.0.0:
   version "4.0.1"
