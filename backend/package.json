@@ -13,7 +13,7 @@
     "serve": "docker run --rm -d -p 8080:8080 --cap-add=SYS_ADMIN --name puppeteer-chrome puppeteer-chrome-linux yarn start"
   },
   "dependencies": {
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "mime": "^2.3.1",
     "multer": "^1.4.1",
     "vm2": "^3.6.4"
