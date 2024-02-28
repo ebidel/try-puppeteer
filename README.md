@@ -2,8 +2,6 @@
 
 > Run [Puppeteer](https://github.com/GoogleChrome/puppeteer) scripts in the cloud.
 
-Try it: https://try-puppeteer.appspot.com
-
 ## Develop
 
 Installation:
